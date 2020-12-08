@@ -1,0 +1,162 @@
+﻿
+@using Kendo.Mvc.UI
+@{
+
+    int commandWidth1 = 60;
+    int commandWidth2 = 125;
+    string theme = "";
+    int approveColWidth = theme == "office365" ? 130 : 120;
+    int pageSize = 50;
+
+    //features
+
+    bool downloadMultiple = false;
+    bool doHardDelete = false;
+    //
+
+}
+<div class="shadow-lg">
+    <table>
+        <tr>
+            <td>
+                <table width="100%">
+                    <tr>
+                        <td width="10%">@(Html.Label("Comment", "Comment", new { style = "font-size: 20px; color: gray" }))</td>
+                        <td width="90%" style="padding-right: 21px; text-overflow:clip">
+                            @(Html.TextArea("Comment", null, new { rows = 2, @class = "k-widget", style = "width: 80%; resize: none; padding: 5px" })
+                )
+                        </td>
+                    </tr>
+                </table>
+
+
+            </td>
+
+        </tr>
+        <tr>
+            <td width="100%">
+                <div class="demo-section k-content">
+                    @(Html.Kendo().Upload()
+            .Name("files")
+            .Async(a => a
+                .Save("Async_Save", "Home")
+                .Remove("Async_Remove", "Home")
+                .AutoUpload(true)
+            ).Events(e => e
+             .Success("onSuccess")
+            .Upload(@<text>
+            function(e) {
+             e.data = { comment: $("#Comment").val() };
+            }
+          </text>)
+
+            )
+        )
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="100%" >
+
+                @(Html.Kendo().Grid<GIS_Upload_Page.Models.UploadViewModel>()
+                    .Name("Grid")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.ID).Hidden(true);
+                        columns.Bound(o => o.Attachment).ClientTemplate("<a class='k-button k-button-icontext' role='button' style='min-width: auto' href='\\#' onclick='upload_grid_atchicon_click(this)'><span class=\"k-icon k-i-download\"></span></a><input type='hidden' />").HtmlAttributes(new { style = "text-align: center", @class = "k-command-cell#if(Attachment!=null){# k-grid-uploadfile#}#", @title = "#if(Attachment!=null){##=Attachment##}#" }).Width(commandWidth1).Title(" ").Groupable(false).Sortable(false).Filterable(false);
+                        columns.Bound(o => o.Email);
+                        // columns.Bound(o => o.CheckedBy);
+                        columns.Bound(o => o.FileName);
+                        columns.Bound(o => o.CreatedDateTime);
+                        //columns.Bound(o => o.RowCount).HtmlAttributes(new { style = "text-align:right;" });
+                        columns.Bound(o => o.Comment);
+                        columns.Bound(o => o.Deleted).Hidden(!doHardDelete);
+                        columns.Command(command =>
+                        {
+                            command.Edit().Text(" ").HtmlAttributes(new { style = "min-width: auto" });
+                            command.Destroy().Text(" ").HtmlAttributes(new { style = "min-width: auto" });
+                        }).Width(commandWidth2);
+                    })
+
+                        .Editable(editable =>
+                        {
+                            editable.Mode(GridEditMode.InLine);
+                        })
+                        .PersistSelection()
+                        .Resizable(c => c.Columns(true))
+                        .Reorderable(c => c.Columns(true))
+                        .Filterable()
+                        .Groupable()
+                        .Pageable(p => p.Numeric(false).PreviousNext(false))
+                        .Selectable(selectable => selectable.Mode(downloadMultiple ? GridSelectionMode.Multiple : GridSelectionMode.Single))
+                        .Sortable()
+                        .Scrollable(scrollable => scrollable.Endless(true))
+                        .ColumnMenu()
+                       .HtmlAttributes(new { style = "height:650px;" })
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Batch(true)
+                            .PageSize(pageSize)
+                            .ServerOperation(false)
+                            .Events(events => events.Error("error_handler"))
+                        .Model(model =>
+                        {
+                            model.Id(o => o.ID);
+                        })
+                        .Read(read => read.Action("Read", "Home"))
+                        .Update(update => update.Action("Update", "Home"))
+                        .Destroy(destroy => destroy.Action("Destroy", "Home").Data("upload_grid_destroy_adddata"))
+                         )
+                        // .Events(events => events.DataBound("upload_grid_databound"))
+                        )
+            </td>
+        </tr>
+    </table>
+</div>
+    <script type="text/javascript">
+        function error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function getUploadGrid() {
+            if (window.uploadGrid) { return window.uploadGrid; } else { window.uploadGrid = $("#Grid").data("kendoGrid"); return window.uploadGrid; }
+        }
+        function onSuccess(e) {
+            
+            getUploadGrid().dataSource.read();
+        }
+        function upload_grid_atchicon_click(o) {         
+            let tr = $(o).closest("tr"); 
+            let dataItem = getUploadGrid().dataItem(tr);
+            if (!dataItem)
+                return;
+            if (dataItem.FileName)
+                upload_grid_download(dataItem.ID);
+        }
+        function upload_grid_download(fileId) {
+           
+            window.open(getBaseUrl() + '/Home/DownloadFile?fileId=' + fileId);
+        }
+        function getBaseUrl() {
+            let getUrl = window.location;
+            let url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+            return url.replace(/\/+$/, '');
+        }
+        function upload_grid_destroy_adddata(e) {
+            return {
+                hardDelete: getUploadGrid().hardDelete
+            };
+        }
+    </script>
+
+

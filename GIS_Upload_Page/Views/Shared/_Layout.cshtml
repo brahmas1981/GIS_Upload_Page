@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GIS Upload Page</title>
+    @*css*@
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/styles/kendo.common-bootstrap.min.css" />
+    <link rel="stylesheet" href="~/styles/kendo.bootstrap.min.css" />
+
+    @*<link href="~/css/kendo.common-bootstrap.min.css" rel="stylesheet" />*@
+    @*   <link href="~/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />*@
+    @*<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.css" />*@
+
+    @*java script*@
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/kendo.all.min.js"></script>
+    <script src="~/js/kendo.aspnetmvc.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-toggleable-sm navbar-dark mb-3" style="background-color: #5d89b4;">
+            <div class="container col-md-12">
+                <a class="navbar-brand" asp-area="">
+                    <img src="~/logo/Exp Logo - White (PNG).png" style="height: 25px;" />
+                    <span class="text-white" style="margin-left: 0.5em">GIS Upload Page</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-nav navbar-collapse collapse d-md-inline-flex flex-md-row-reverse">
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid" style="height:800px">
+        @RenderBody()
+    </div>
+    <footer class="border-top text-muted" style="text-align: center">
+        <span>Copyright &copy; 2020</span>
+        <img src="~/logo/Exp Logo - Color - CMYK (PNG).png" style="height: 25px" />
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

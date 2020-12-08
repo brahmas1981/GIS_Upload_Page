@@ -139,7 +139,8 @@ namespace GIS_Upload_Page.Controllers
                             FileSize = fileSize,
                             FileContent = stream.ToArray(),
                             Comment = comment,
-                            RowCount = lineCout
+                            RowCount = lineCout,
+                            
                         };
 
                        
@@ -177,10 +178,8 @@ namespace GIS_Upload_Page.Controllers
                                 MailMessage msg = new MailMessage();
                                 msg.From = new MailAddress(email_from);
                                 msg.Subject = "Find attached Uploaded files uploaded by you!!";
-                                var toAddress = uploadViewModel.Email;
-                                //var toAddress = "satarupa.brahma@exp.com;Joseph.Escobedo@exp.com";
+                                var toAddress = User.Identity.Name;
                                 msg.To.Add(toAddress);
-                                //msg.CC.Add("Joseph.Escobedo@exp.com");
                                 msg.Body = "GIS Upload Page - new app - Email testing";
                                 msg.IsBodyHtml = true;
                                 using (var smtp = new SmtpClient(email_smtp))
